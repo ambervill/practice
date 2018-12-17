@@ -51,6 +51,17 @@ class DynamicList
   end
   alias << add_value
 
+  def prepend(new_node)
+    reset!
+    new_node.next = @current
+    @head = new_node
+  end
+
+  def prepend_value(new_value)
+    prepend ListNode.new(new_value)
+  end
+  alias >> prepend_value
+
   def reset!
     @current = @head
   end
@@ -136,13 +147,15 @@ class DynamicList
       res
     end
   end
+
 end
 
 # DynamicList.new([9,8,7,6,5,4]).merge_sort.each do |elem|
 #   puts elem.val
 # end
 
-x = DynamicList.new([9,8,7,6,5,4])
+x = DynamicList.new([9,8,7,6,5,4]).merge_sort
 x << 32
-puts x.merge_sort
+x >> 2
 puts x
+
