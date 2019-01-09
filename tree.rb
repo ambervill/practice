@@ -68,6 +68,45 @@ def print_no_recursive(root)
   end
 end
 
+# Inorder sequence: D B E A C H F G
+# Preorder sequence: A B D E C F H G
+# Tree:
+#             A
+#           /  \
+#         /     \
+#        B       C
+#       / \       \
+#     /    \       \
+#    D      E       F
+#                 /  \
+#               H     G
+def tree_from_inorder_and_preorder(inorder, preorder)
+  if inorder.length != preorder.length
+    raise "Error in sequences."
+  end
+  if preorder.length == 1
+    return TreeNode.new(preorder[0])
+  end
+  if preorder.length == 0
+    return nil
+  end
+  current_root = preorder[0]
+  root_index = inorder.index(current_root)
+  raise "Error in sequences." unless root_index
+  left_inorder = root_index.zero? ? [] : inorder[0..root_index - 1]
+  right_inorder = inorder[root_index+1..inorder.length]
+  left_preorder = preorder[1..left_inorder.length]
+  right_preorder = preorder[left_inorder.length+1..preorder.length]
+
+  root = TreeNode.new(current_root)
+  root.left = tree_from_inorder_and_preorder(left_inorder, left_preorder)
+  root.right = tree_from_inorder_and_preorder(right_inorder, right_preorder)
+  root
+end
+
+root = tree_from_inorder_and_preorder(%w(D B E A C H F G), %w(A B D E C F H G))
+print_tree root
+
 # root = TreeNode.new(0)
 # root.left = TreeNode.new(2)
 # root.right = TreeNode.new(2)
