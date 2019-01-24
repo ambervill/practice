@@ -1,19 +1,17 @@
 # Implement the Attributes module in plain ruby
 
 module Attributes
+  def attributes
+    attributes = self.class.instance_variable_get :@attributes
+    ret = {}
+    attributes.each do |attribute|
+      ret.store(attribute, self.send(attribute))
+    end
+    ret
+  end
   def self.included(base)
     base.instance_variable_set :@attributes, []
     base.extend(ClassMethods)
-    base.class_eval do
-      define_method :attributes do
-        attributes = self.class.instance_variable_get :@attributes
-        ret = {}
-        attributes.each do |attribute|
-          ret.store(attribute, self.send(attribute))
-        end
-        ret
-      end
-    end
   end
   module ClassMethods
     def attribute(attr_name, default = {})
