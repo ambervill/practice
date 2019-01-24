@@ -20,7 +20,7 @@ class DynamicList
   attr_accessor :current
   @head = nil
 
-  def initialize(elements = [])
+  def initialize(*elements)
     elements.each.with_index(0) do |element, i|
       new_node = ListNode.new(element)
       if i == 0
@@ -66,12 +66,21 @@ class DynamicList
     @current = @head
   end
 
-  def print
+  def reverse!
+    return self if self.length <= 1
     reset!
-    while @current != nil
-      puts @current.val
-      @current = @current.next
+    prev_node = nil
+    current_node = @head
+    next_node = nil
+
+    while current_node != nil
+      next_node = current_node.next
+      current_node.next = prev_node
+      prev_node = current_node
+      current_node = next_node
     end
+    @head = prev_node
+    self
   end
 
   def merge_sort
@@ -154,8 +163,16 @@ end
 #   puts elem.val
 # end
 
-x = DynamicList.new([9,8,7,6,5,4]).merge_sort
+x = DynamicList.new(9,8,7,6,5,4).merge_sort
 x << 32
 x >> 2
 puts x
+puts x.reverse!
 
+require 'rspec/autorun'
+RSpec.describe "test" do
+  subject{ DynamicList.new(9,8,7,6,5,4).reverse!.to_s}
+  it "should pass" do
+    expect(subject).to eq("4, 5, 6, 7, 8, 9")
+  end
+end
