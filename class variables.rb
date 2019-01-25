@@ -13,7 +13,6 @@ class Test
   end
 
   def get_var
-    # @var = 6
     puts "get_var.@var=#@var" || "No @var"
     puts "get_var.@@classvar=#@@classvar"
     puts "get_var.ABC=#{ABC}"
