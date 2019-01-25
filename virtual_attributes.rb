@@ -47,6 +47,6 @@ puts login.email         # => "me@example.org"
 puts login.password      # => "mypassword"
 puts login.remember_me   # => true
 puts login.remember_me2   # => false
-# Login.foo(7)
+
 puts login.attributes    # => { email: "me@example.org", password: "mypassword", remember_me: true }
 

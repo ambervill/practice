@@ -9,16 +9,14 @@ class A
   a = 3
 end
 
-define_method :dd, Proc.new {puts "defined"}
-dd
 
-# puts A.instance_variable_get(:@a)
-# puts A.class_variable_get(:@@a)
-# A.instance_eval do
-#   puts a
-# end
-# # puts A.class_eval("a")
+puts A.instance_variable_get(:@a)
+puts A.class_variable_get(:@@a)
+class A
+  puts local_variables
+end
+puts A.send(:local_variables)
 # aa = A.new
 # puts aa.instance_variable_get(:@a)
 # puts A.class_variable_get(:@@a)
-# puts aa.instance_eval("a")
+# puts aa.send(:local_variables)
