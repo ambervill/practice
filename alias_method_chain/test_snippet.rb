@@ -1,3 +1,5 @@
+# http://ruby-metaprogramming.rubylearning.com/
+
 require './rubyist'
 satish = Rubyist.new('Satish')
 3.times{satish.say!}

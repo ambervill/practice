@@ -19,7 +19,7 @@ module RubyLearning
           feature_without_excl = feature.to_s.gsub(excl, "")
           feature_without_target_name = "#{feature_without_excl}_without_#{target}#{excl}".to_sym
           feature_with_target_name = "#{feature_without_excl}_with_#{target}#{excl}".to_sym
-          yield(feature_with_target_name, excl) if block_given?
+          yield(feature, target, feature_with_target_name) if block_given?
           feature_is_private = private_instance_methods.include? feature
           feature_is_protected = protected_instance_methods.include? feature
           alias_method feature_without_target_name, feature
