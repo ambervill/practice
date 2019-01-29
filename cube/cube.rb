@@ -3,12 +3,16 @@ class Side
   attr_reader :letter
   attr_reader :tiles
 
-  def initialize(color, letter)
+  def initialize(color, letter, tiles = nil)
     @color = color
     @letter = letter
-    @tiles = {}
-    [:upper_left, :upper_center, :upper_right, :center_left, :center_center, :center_right, :bottom_left, :bottom_center, :bottom_right].each do |position|
-      @tiles[position] = color
+    if tiles.nil?
+      @tiles = {}
+      [:upper_left, :upper_center, :upper_right, :center_left, :center_center, :center_right, :bottom_left, :bottom_center, :bottom_right].each do |position|
+        @tiles[position] = color
+      end
+    else
+      @tiles = tiles
     end
   end
 
@@ -48,7 +52,7 @@ class Side
       when :bottom
         @tiles[:bottom_left], @tiles[:bottom_center], @tiles[:bottom_right] = new_colors
       else
-        raise "Incorrect rotate side."
+        raise "Incorrect rotate side: #{side}."
     end
   end
 
@@ -73,6 +77,7 @@ class Cube
   attr_reader :sides
   def initialize
     @sides = {}
+    @temp_sides = {}
     @sides[:u] = Side.new(:red, :u)
     @sides[:f] = Side.new(:white, :f)
     @sides[:d] = Side.new(:orange, :d)
@@ -84,18 +89,21 @@ class Cube
   # @param [Symbol] side in {u, f, d, b, l, r}
   # @param direction in {:left, :right}
   def rotate(side, direction)
-    @temp_sides = {}
     @sides.each_pair do |key, value|
-      @temp_sides[key] = value.clone
+      @temp_sides[key] = Side.new(nil, nil, value.tiles.dup)
     end
+
     case side
       when :u
-
+        @sides[:f].replace_layer(:upper, @temp_sides[:r].get_layer(:left).reverse)
+        @sides[:l].replace_layer(:right, @temp_sides[:f].get_layer(:upper))
+        @sides[:b].replace_layer(:bottom, @temp_sides[:l].get_layer(:right).reverse)
+        @sides[:r].replace_layer(:left, @temp_sides[:b].get_layer(:bottom))
       when :f
-        @sides[:u].replace_layer(:bottom, @temp_sides[:l].get_layer(:right).reverse)
-        @sides[:r].replace_layer(:left, @temp_sides[:u].get_layer(:bottom))
-        @sides[:d].replace_layer(:upper, @temp_sides[:r].get_layer(:left).reverse)
-        @sides[:l].replace_layer(:right, @temp_sides[:r].get_layer(:upper))
+        @sides[:u].replace_layer(:bottom, @temp_sides[:l].get_layer(:bottom))
+        @sides[:r].replace_layer(:bottom, @temp_sides[:u].get_layer(:bottom))
+        @sides[:d].replace_layer(:upper, @temp_sides[:r].get_layer(:bottom).reverse)
+        @sides[:l].replace_layer(:bottom, @temp_sides[:d].get_layer(:upper).reverse)
       when :d
 
       when :b
@@ -112,13 +120,16 @@ class Cube
 
   def to_s
     ret = ""
-    @sides.each_value do |side|
-      ret += side.to_s + "\n\n"
+    @sides.each_pair do |position, side|
+      ret += position.to_s + ":\n"
+      ret += side.to_s + "\n"
     end
     ret
   end
 end
 
 cube = Cube.new
+cube.rotate(:u, :right)
 cube.rotate(:f, :right)
+cube.rotate(:u, :right)
 puts cube
