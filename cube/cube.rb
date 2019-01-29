@@ -105,9 +105,15 @@ class Cube
         @sides[:d].replace_layer(:upper, @temp_sides[:r].get_layer(:bottom).reverse)
         @sides[:l].replace_layer(:bottom, @temp_sides[:d].get_layer(:upper).reverse)
       when :d
-
+        @sides[:f].replace_layer(:bottom, @temp_sides[:l].get_layer(:left))
+        @sides[:l].replace_layer(:left, @temp_sides[:b].get_layer(:upper).reverse)
+        @sides[:b].replace_layer(:upper, @temp_sides[:r].get_layer(:right))
+        @sides[:r].replace_layer(:right, @temp_sides[:f].get_layer(:bottom).reverse)
       when :b
-
+        @sides[:u].replace_layer(:upper, @temp_sides[:r].get_layer(:upper))
+        @sides[:r].replace_layer(:upper, @temp_sides[:d].get_layer(:bottom).reverse)
+        @sides[:d].replace_layer(:bottom, @temp_sides[:l].get_layer(:upper).reverse)
+        @sides[:l].replace_layer(:upper, @temp_sides[:u].get_layer(:upper))
       when :l
 
       when :r
@@ -129,7 +135,8 @@ class Cube
 end
 
 cube = Cube.new
-cube.rotate(:u, :right)
-cube.rotate(:f, :right)
-cube.rotate(:u, :right)
+105.times do
+  cube.rotate(:f, :right)
+  cube.rotate(:d, :right)
+end
 puts cube
