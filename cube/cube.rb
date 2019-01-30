@@ -1,11 +1,9 @@
 class Side
   attr_reader :color
-  attr_reader :letter
   attr_reader :tiles
 
-  def initialize(color, letter, tiles = nil)
+  def initialize(color, tiles = nil)
     @color = color
-    @letter = letter
     if tiles.nil?
       @tiles = {}
       [:upper_left, :upper_center, :upper_right, :center_left, :center_center, :center_right, :bottom_left, :bottom_center, :bottom_right].each do |position|
@@ -16,13 +14,13 @@ class Side
     end
   end
 
-  # @param direction = :left, :right
+  # @param direction in {:clockwise, :counterclockwise}
   def rotate(direction)
     case direction
-      when :left
+      when :counterclockwise
         @tiles[:upper_left], @tiles[:upper_center], @tiles[:upper_right], @tiles[:center_left],  @tiles[:center_right], @tiles[:bottom_left], @tiles[:bottom_center], @tiles[:bottom_right] =
            @tiles[:upper_right], @tiles[:center_right], @tiles[:bottom_right], @tiles[:upper_center],  @tiles[:bottom_center], @tiles[:upper_left], @tiles[:center_left], @tiles[:bottom_left]
-      when :right
+      when :clockwise
         @tiles[:upper_left], @tiles[:upper_center], @tiles[:upper_right], @tiles[:center_left],  @tiles[:center_right], @tiles[:bottom_left], @tiles[:bottom_center], @tiles[:bottom_right] =
            @tiles[:bottom_left], @tiles[:center_left], @tiles[:upper_left], @tiles[:bottom_center],  @tiles[:upper_center], @tiles[:bottom_right], @tiles[:center_right], @tiles[:upper_right]
       else
@@ -71,56 +69,108 @@ class Side
         raise "Incorrect rotate side."
     end
   end
+
+  def solved?
+    @tiles.values.uniq == [@color]
+  end
 end
 
 class Cube
-  attr_reader :sides
+  # attr_reader :sides
   def initialize
     @sides = {}
     @temp_sides = {}
-    @sides[:u] = Side.new(:red, :u)
-    @sides[:f] = Side.new(:white, :f)
-    @sides[:d] = Side.new(:orange, :d)
-    @sides[:b] = Side.new(:yellow, :b)
-    @sides[:l] = Side.new(:green, :l)
-    @sides[:r] = Side.new(:blue, :r)
+    @sides[:u] = Side.new(:red)
+    @sides[:f] = Side.new(:white)
+    @sides[:d] = Side.new(:orange)
+    @sides[:b] = Side.new(:yellow)
+    @sides[:l] = Side.new(:green)
+    @sides[:r] = Side.new(:blue)
   end
 
   # @param [Symbol] side in {u, f, d, b, l, r}
-  # @param direction in {:left, :right}
+  # @param direction in {:clockwise, :counterclockwise}
   def rotate(side, direction)
     @sides.each_pair do |key, value|
-      @temp_sides[key] = Side.new(nil, nil, value.tiles.dup)
+      @temp_sides[key] = Side.new(nil, value.tiles.dup)
     end
+    case direction
+      when :clockwise
+        case side
+          when :u
+            @sides[:f].replace_layer(:upper, @temp_sides[:r].get_layer(:left).reverse)
+            @sides[:l].replace_layer(:right, @temp_sides[:f].get_layer(:upper))
+            @sides[:b].replace_layer(:bottom, @temp_sides[:l].get_layer(:right).reverse)
+            @sides[:r].replace_layer(:left, @temp_sides[:b].get_layer(:bottom))
+          when :f
+            @sides[:u].replace_layer(:bottom, @temp_sides[:l].get_layer(:bottom))
+            @sides[:r].replace_layer(:bottom, @temp_sides[:u].get_layer(:bottom))
+            @sides[:d].replace_layer(:upper, @temp_sides[:r].get_layer(:bottom).reverse)
+            @sides[:l].replace_layer(:bottom, @temp_sides[:d].get_layer(:upper).reverse)
+          when :d
+            @sides[:f].replace_layer(:bottom, @temp_sides[:l].get_layer(:left))
+            @sides[:l].replace_layer(:left, @temp_sides[:b].get_layer(:upper).reverse)
+            @sides[:b].replace_layer(:upper, @temp_sides[:r].get_layer(:right))
+            @sides[:r].replace_layer(:right, @temp_sides[:f].get_layer(:bottom).reverse)
+          when :b
+            @sides[:u].replace_layer(:upper, @temp_sides[:r].get_layer(:upper))
+            @sides[:r].replace_layer(:upper, @temp_sides[:d].get_layer(:bottom).reverse)
+            @sides[:d].replace_layer(:bottom, @temp_sides[:l].get_layer(:upper).reverse)
+            @sides[:l].replace_layer(:upper, @temp_sides[:u].get_layer(:upper))
+          when :l
+            @sides[:u].replace_layer(:left, @temp_sides[:b].get_layer(:left))
+            @sides[:b].replace_layer(:left, @temp_sides[:d].get_layer(:left))
+            @sides[:d].replace_layer(:left, @temp_sides[:f].get_layer(:left))
+            @sides[:f].replace_layer(:left, @temp_sides[:u].get_layer(:left))
+          when :r
+            @sides[:u].replace_layer(:right, @temp_sides[:f].get_layer(:right))
+            @sides[:f].replace_layer(:right, @temp_sides[:d].get_layer(:right))
+            @sides[:d].replace_layer(:right, @temp_sides[:b].get_layer(:right))
+            @sides[:b].replace_layer(:right, @temp_sides[:u].get_layer(:right))
+          else
+            raise "Cube.rotate: Incorrect rotate side: #{side}."
+        end
 
-    case side
-      when :u
-        @sides[:f].replace_layer(:upper, @temp_sides[:r].get_layer(:left).reverse)
-        @sides[:l].replace_layer(:right, @temp_sides[:f].get_layer(:upper))
-        @sides[:b].replace_layer(:bottom, @temp_sides[:l].get_layer(:right).reverse)
-        @sides[:r].replace_layer(:left, @temp_sides[:b].get_layer(:bottom))
-      when :f
-        @sides[:u].replace_layer(:bottom, @temp_sides[:l].get_layer(:bottom))
-        @sides[:r].replace_layer(:bottom, @temp_sides[:u].get_layer(:bottom))
-        @sides[:d].replace_layer(:upper, @temp_sides[:r].get_layer(:bottom).reverse)
-        @sides[:l].replace_layer(:bottom, @temp_sides[:d].get_layer(:upper).reverse)
-      when :d
-        @sides[:f].replace_layer(:bottom, @temp_sides[:l].get_layer(:left))
-        @sides[:l].replace_layer(:left, @temp_sides[:b].get_layer(:upper).reverse)
-        @sides[:b].replace_layer(:upper, @temp_sides[:r].get_layer(:right))
-        @sides[:r].replace_layer(:right, @temp_sides[:f].get_layer(:bottom).reverse)
-      when :b
-        @sides[:u].replace_layer(:upper, @temp_sides[:r].get_layer(:upper))
-        @sides[:r].replace_layer(:upper, @temp_sides[:d].get_layer(:bottom).reverse)
-        @sides[:d].replace_layer(:bottom, @temp_sides[:l].get_layer(:upper).reverse)
-        @sides[:l].replace_layer(:upper, @temp_sides[:u].get_layer(:upper))
-      when :l
-
-      when :r
+      when :counterclockwise
+        case side
+          when :u
+            @sides[:b].replace_layer(:bottom, @temp_sides[:r].get_layer(:left))
+            @sides[:r].replace_layer(:left, @temp_sides[:f].get_layer(:upper).reverse)
+            @sides[:f].replace_layer(:upper, @temp_sides[:l].get_layer(:right))
+            @sides[:l].replace_layer(:right, @temp_sides[:b].get_layer(:bottom).reverse)
+          when :f
+            @sides[:u].replace_layer(:bottom, @temp_sides[:r].get_layer(:bottom))
+            @sides[:r].replace_layer(:bottom, @temp_sides[:d].get_layer(:upper).reverse)
+            @sides[:d].replace_layer(:upper, @temp_sides[:l].get_layer(:bottom).reverse)
+            @sides[:l].replace_layer(:bottom, @temp_sides[:u].get_layer(:bottom))
+          when :d
+            @sides[:f].replace_layer(:bottom, @temp_sides[:r].get_layer(:right).reverse)
+            @sides[:l].replace_layer(:left, @temp_sides[:f].get_layer(:bottom))
+            @sides[:b].replace_layer(:upper, @temp_sides[:l].get_layer(:left).reverse)
+            @sides[:r].replace_layer(:right, @temp_sides[:b].get_layer(:upper))
+          when :b
+            @sides[:u].replace_layer(:upper, @temp_sides[:l].get_layer(:upper))
+            @sides[:r].replace_layer(:upper, @temp_sides[:u].get_layer(:upper))
+            @sides[:d].replace_layer(:bottom, @temp_sides[:r].get_layer(:upper).reverse)
+            @sides[:l].replace_layer(:upper, @temp_sides[:d].get_layer(:bottom).reverse)
+          when :l
+            @sides[:u].replace_layer(:left, @temp_sides[:f].get_layer(:left))
+            @sides[:b].replace_layer(:left, @temp_sides[:u].get_layer(:left))
+            @sides[:d].replace_layer(:left, @temp_sides[:b].get_layer(:left))
+            @sides[:f].replace_layer(:left, @temp_sides[:d].get_layer(:left))
+          when :r
+            @sides[:u].replace_layer(:right, @temp_sides[:b].get_layer(:right))
+            @sides[:f].replace_layer(:right, @temp_sides[:u].get_layer(:right))
+            @sides[:d].replace_layer(:right, @temp_sides[:f].get_layer(:right))
+            @sides[:b].replace_layer(:right, @temp_sides[:d].get_layer(:right))
+          else
+            raise "Cube.rotate: Incorrect rotate side: #{side}."
+        end
 
       else
-        raise "Cube.rotate: Incorrect rotate side."
+        raise "Incorrect rotate direction."
     end
+
     @sides[side].rotate(direction)
   end
 
@@ -132,11 +182,29 @@ class Cube
     end
     ret
   end
+
+  def solved?
+    @sides.values.inject(true){|memo, side| memo && side.solved?}
+  end
+
+  # @param [String] seq = "u ri ui l b di bi ri d ui"
+  def algorithm(seq)
+    seq.split(" ").each do |step|
+      case
+        when %w(f u d b l r).include?(step)
+          rotate(step.to_sym, :clockwise)
+        when %w(fi ui di bi li ri).include?(step)
+          rotate(step[0].to_sym, :counterclockwise)
+        else
+          raise "Incorrect step: #{step}"
+      end
+    end
+  end
 end
 
-cube = Cube.new
-105.times do
-  cube.rotate(:f, :right)
-  cube.rotate(:d, :right)
+class Algorithm
+  @mapping = {0 => :u, 1 => :f, 2 => :d, 3 => :b, 4 => :l, 5 => :r, 6 => :ui, 7 => :fi, 8 => :di, 9 => :bi, 10 => :li, 11 => :ri}
+  def self.generate(length)
+    (1..length).map{@mapping[rand(12)]}.join(" ")
+  end
 end
-puts cube
