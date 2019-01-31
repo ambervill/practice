@@ -2,10 +2,9 @@ require './cube'
 
 cube = Cube.new
 distribution = {}
-200.times do
+3000.times do
   counter = 0
-  algorithm = Algorithm.generate(2)
-  # puts algorithm
+  algorithm = Algorithm.generate(41)
   begin
     cube.algorithm algorithm
     counter += 1
@@ -13,7 +12,7 @@ distribution = {}
   distribution[counter] ||= 0
   distribution[counter] += 1
 end
-# puts cube
-# puts cube.solved?
-puts distribution
-puts distribution.keys.sort
+
+distribution.keys.sort.each do |key|
+  print key, "=", distribution[key], "\n"
+end

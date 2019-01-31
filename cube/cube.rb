@@ -203,8 +203,14 @@ class Cube
 end
 
 class Algorithm
-  @mapping = {0 => :u, 1 => :f, 2 => :d, 3 => :b, 4 => :l, 5 => :r, 6 => :ui, 7 => :fi, 8 => :di, 9 => :bi, 10 => :li, 11 => :ri}
-  def self.generate(length)
-    (1..length).map{@mapping[rand(12)]}.join(" ")
+  @mapping = {0 => :u, 1 => :f, 2 => :d, 3 => :b, 4 => :l, 5 => :r, 6 => :ri, 7 => :li, 8 => :bi, 9 => :di, 10 => :fi, 11 => :ui}
+  def self.generate(length, exclude_empty = false)
+    random_sequence = []
+    while random_sequence.length < length
+      next_rand = rand(12)
+      redo if exclude_empty && random_sequence.any? && next_rand + random_sequence[-1] == 11
+      random_sequence << next_rand
+    end
+    return (0..length).map{|i| @mapping[random_sequence[i]]}.join(" ")
   end
 end
