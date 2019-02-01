@@ -20,3 +20,16 @@ puts A.send(:local_variables)
 # puts aa.instance_variable_get(:@a)
 # puts A.class_variable_get(:@@a)
 # puts aa.send(:local_variables)
+
+class B
+  # class << self
+  #   attr_accessor :foo
+  # end
+end
+
+B.singleton_class.instance_eval do
+  attr_accessor :foo
+end
+
+B.foo = 3
+puts B.foo

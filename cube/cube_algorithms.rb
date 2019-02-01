@@ -2,8 +2,8 @@ require './cube'
 
 cube = Cube.new
 distribution = {}
-(2..99).each do |alg_length|
-  100.times do
+(100..199).each do |alg_length|
+  50.times do
     counter = 0
     algorithm = Algorithm.generate(alg_length)
     begin
