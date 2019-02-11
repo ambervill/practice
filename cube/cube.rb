@@ -66,17 +66,24 @@ class Side
       when :bottom
         return [@tiles[:bottom_left], @tiles[:bottom_center], @tiles[:bottom_right] ]
       else
-        raise "Incorrect rotate side."
+        raise "Incorrect rotate side: #{side}."
     end
   end
 
   def solved?
     @tiles.values.uniq == [@color]
   end
+
+  def [](tile)
+    @tiles[tile]
+  end
 end
 
+
+# Cube
+
 class Cube
-  # attr_reader :sides
+  attr_reader :sides
   def initialize
     @sides = {}
     @temp_sides = {}
@@ -166,13 +173,13 @@ class Cube
           else
             raise "Cube.rotate: Incorrect rotate side: #{side}."
         end
-
       else
         raise "Incorrect rotate direction."
     end
 
     @sides[side].rotate(direction)
   end
+  private :rotate
 
   def to_s
     ret = ""
@@ -200,6 +207,42 @@ class Cube
       end
     end
   end
+
+  # @param axes in {:radial, :horizontal, :vertical}
+  # @param direction in {:clockwise, :counterclockwise}
+  def turn(axes, direction)
+    raise "Incorrect axes: #{axes}" unless [:radial, :horizontal, :vertical].include? axes
+    raise "Incorrect direction: #{direction}" unless [:clockwise, :counterclockwise].include? direction
+    case axes
+      when :radial
+        case direction
+          when :clockwise
+            @sides[:u], @sides[:r], @sides[:d], @sides[:l] = @sides[:l], @sides[:u], @sides[:r], @sides[:d]
+          when :counterclockwise
+            @sides[:u], @sides[:r], @sides[:d], @sides[:l] = @sides[:r], @sides[:d], @sides[:l], @sides[:u]
+        end
+      when :horizontal
+        case direction
+          when :clockwise
+            @sides[:u], @sides[:f], @sides[:d], @sides[:b] = @sides[:f], @sides[:d], @sides[:b], @sides[:u]
+          when :counterclockwise
+            @sides[:u], @sides[:f], @sides[:d], @sides[:b] = @sides[:b], @sides[:u], @sides[:f], @sides[:d]
+        end
+      when :vertical
+        case direction
+          when :clockwise
+            @sides[:r], @sides[:f], @sides[:l], @sides[:b] = @sides[:b], @sides[:r], @sides[:f], @sides[:l]
+          when :counterclockwise
+            @sides[:r], @sides[:f], @sides[:l], @sides[:b] = @sides[:f], @sides[:l], @sides[:b], @sides[:r]
+        end
+    end
+  end
+
+  def [](side)
+    @sides[side]
+  end
+
+  alias << algorithm
 end
 
 class Algorithm

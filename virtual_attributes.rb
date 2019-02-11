@@ -2,28 +2,30 @@
 
 module Attributes
   def attributes
-    attributes = self.class.instance_variable_get :@attributes
-    ret = {}
-    attributes.each do |attribute|
-      ret.store(attribute, self.send(attribute))
-    end
-    ret
+    # attributes = self.class.instance_variable_get :@attributes
+    attributes = self.class.attributes
+    attributes.inject({}){|memo, attribute| memo[attribute] = self.send(attribute); memo}
   end
   def self.included(base)
-    base.instance_variable_set :@attributes, []
+    base.singleton_class.instance_eval do
+      attr_accessor :attributes
+    end
+    # base.instance_variable_set :@attributes, []
+    base.attributes = []
     base.extend(ClassMethods)
   end
   module ClassMethods
     def attribute(attr_name, default = {})
-      attributes = instance_variable_get(:@attributes)
+      # attributes = instance_variable_get(:@attributes)
       attributes << attr_name
       define_method attr_name do
         ret = instance_variable_get :"@#{attr_name}"
         ret.nil? ? default[:default] : ret
       end
-      define_method "#{attr_name}=" do |new_value|
-        instance_variable_set :"@#{attr_name}", new_value
-      end
+      # define_method "#{attr_name}=" do |new_value|
+      #   instance_variable_set :"@#{attr_name}", new_value
+      # end
+      attr_writer attr_name
     end
   end
 end
