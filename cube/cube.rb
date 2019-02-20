@@ -1,7 +1,6 @@
 class Side
   attr_reader :color
   attr_reader :tiles
-
   def initialize(color, tiles = nil)
     @color = color
     if tiles.nil?
@@ -74,8 +73,9 @@ class Side
     @tiles.values.uniq == [@color]
   end
 
+  # @param tile in {:upper_left, :upper_center, :upper_right, :center_left, :center_center, :center_right, :bottom_left, :bottom_center, :bottom_right}
   def [](tile)
-    @tiles[tile]
+    @tiles[tile] || raise("Incorrect tile: #{tile}. Valid tiles: :upper_left, :upper_center, :upper_right, :center_left, :center_center, :center_right, :bottom_left, :bottom_center, :bottom_right")
   end
 end
 
@@ -83,10 +83,11 @@ end
 # Cube
 
 class Cube
-  attr_reader :sides
+  attr_reader :sides, :history
   def initialize
     @sides = {}
     @temp_sides = {}
+    @history = []
     @sides[:u] = Side.new(:red)
     @sides[:f] = Side.new(:white)
     @sides[:d] = Side.new(:orange)
@@ -205,8 +206,10 @@ class Cube
         else
           raise "Incorrect step: #{step}"
       end
+      @history << step
     end
   end
+  alias << algorithm
 
   # @param axes in {:radial, :horizontal, :vertical}
   # @param direction in {:clockwise, :counterclockwise}
@@ -218,31 +221,43 @@ class Cube
         case direction
           when :clockwise
             @sides[:u], @sides[:r], @sides[:d], @sides[:l] = @sides[:l], @sides[:u], @sides[:r], @sides[:d]
+            @sides[:f].rotate(:clockwise)
+            @sides[:b].rotate(:counterclockwise)
           when :counterclockwise
             @sides[:u], @sides[:r], @sides[:d], @sides[:l] = @sides[:r], @sides[:d], @sides[:l], @sides[:u]
+            @sides[:f].rotate(:counterclockwise)
+            @sides[:b].rotate(:clockwise)
         end
       when :horizontal
         case direction
           when :clockwise
             @sides[:u], @sides[:f], @sides[:d], @sides[:b] = @sides[:f], @sides[:d], @sides[:b], @sides[:u]
+            @sides[:r].rotate(:clockwise)
+            @sides[:l].rotate(:counterclockwise)
           when :counterclockwise
             @sides[:u], @sides[:f], @sides[:d], @sides[:b] = @sides[:b], @sides[:u], @sides[:f], @sides[:d]
+            @sides[:r].rotate(:counterclockwise)
+            @sides[:l].rotate(:clockwise)
         end
       when :vertical
         case direction
           when :clockwise
             @sides[:r], @sides[:f], @sides[:l], @sides[:b] = @sides[:b], @sides[:r], @sides[:f], @sides[:l]
+            @sides[:u].rotate(:clockwise)
+            @sides[:d].rotate(:counterclockwise)
           when :counterclockwise
             @sides[:r], @sides[:f], @sides[:l], @sides[:b] = @sides[:f], @sides[:l], @sides[:b], @sides[:r]
+            @sides[:u].rotate(:counterclockwise)
+            @sides[:d].rotate(:clockwise)
         end
     end
+    @history << "turn #{axes} #{direction}"
   end
 
   def [](side)
     @sides[side]
   end
 
-  alias << algorithm
 end
 
 class Algorithm

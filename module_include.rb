@@ -20,23 +20,6 @@ module B
     end
   end
 
-  # def self.included(base)
-  #   base.extend ClassMethods
-  #   # base.class_eval do
-  #   #   scope :disabled, -> { where(disabled: true) }
-  #   # end
-  # end
-
-  # module ClassMethods
-  #   def third
-  #     puts "third"
-  #   end
-  #
-  #   def fourth
-  #     puts "fourth"
-  #   end
-  # end
-
 end
 
 class A
@@ -45,6 +28,6 @@ end
 
 a = A.new
 a.second
-# A.third
+
 a.third
-# puts A.instance_methods
+

@@ -134,25 +134,3 @@ end
 # x = [2, 3, 5, 2, 8, 2, 1, 4]
 # puts x.insertion_sort
 
-# def random_array(n)
-#   ret = []
-#   (1..n).each do
-#     ret << rand(10000)
-#   end
-#   ret
-# end
-#
-# require 'benchmark'
-#
-# Benchmark.bmbm do |x|
-#   arr1 = random_array(1000)
-#   arr2 = random_array(5000)
-#   arr3 = random_array(25000)
-#   arr4 = random_array(125000)
-#   arr5 = random_array(625000)
-#   x.report("merge_sort 10") { arr1.quick_sort }
-#   x.report("merge_sort 20") { arr2.quick_sort }
-#   x.report("merge_sort 30") { arr3.quick_sort }
-#   x.report("merge_sort 40") { arr4.quick_sort }
-#   x.report("merge_sort 50") { arr5.quick_sort }
-# end

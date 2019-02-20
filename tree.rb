@@ -106,17 +106,3 @@ end
 
 root = tree_from_inorder_and_preorder(%w(D B E A C H F G), %w(A B D E C F H G))
 print_tree root
-
-# root = TreeNode.new(0)
-# root.left = TreeNode.new(2)
-# root.right = TreeNode.new(2)
-# root.left.left = TreeNode.new(3)
-# root.left.left.right = TreeNode.new(6)
-# root.left.right = TreeNode.new(4)
-# root.right.left = TreeNode.new(4)
-# root.right.right = TreeNode.new(3)
-#
-# print_tree root
-# # puts is_symmetric(root)
-# # preorder(root)
-# print_no_recursive(root)
